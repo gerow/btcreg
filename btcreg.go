@@ -1,0 +1,4 @@
+package btcreg
+
+func Main() {
+}
