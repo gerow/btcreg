@@ -13,5 +13,6 @@ func Main() {
     r.HandleFunc("/n/{uuid}", NewAddressFormHandler).Methods("GET")
     r.HandleFunc("/n/{uuid}", NewAddressHandler).Methods("POST")
     r.HandleFunc("/d/{uuid}", DeleteAddressHandler).Methods("DELETE")
+    r.PathPrefix("/static/").Handler(http.FileServer(http.Dir(".")))
     http.ListenAndServe(":8080", r)
 }
