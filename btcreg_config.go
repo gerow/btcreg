@@ -1,6 +1,6 @@
 package btcreg
 
-struct Config {
+type Config struct {
     Port string
     PostgresServer string
 }
