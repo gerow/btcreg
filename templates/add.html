@@ -1,10 +1,13 @@
 <h1>Add your address</h1>
 <form method="post" action="/add/">
-  <label for="email">
-    <i class="icon-envelope"></i> Email
-  </label>
-  <input type="text" name="email" placeholder="test@example.com"></br>
-  <button type="submit" class="btn btn-primary">
-    Submit
-  </button>
+  <div class="control-group {{if .Error }}error{{end}}">
+    <label class="control-label" for="email"><i class="icon-envelope"></i> Email</label>
+    <div class="controls">
+      <input type="text" id="email" placeholder="test@example.com">
+      {{if .Error}}<span class="help-inline">Please correct the error</span>{{end}}</br>
+      <button type="submit" class="btn btn-primary">
+        Submit
+      </button>
+    </div>
+  </div>
 </form>
