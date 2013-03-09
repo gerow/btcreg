@@ -6,6 +6,7 @@ import (
     "fmt"
     "html/template"
     "bytes"
+    "strings"
 )
 
 type BaseData struct {
@@ -24,6 +25,11 @@ type NavData struct {
 type QueryData struct {
     Email string
     Address string
+}
+
+type AddData struct {
+    Error bool
+    DefaultValue string
 }
 
 func buildBase(title string, nav template.HTML, content template.HTML) ([]byte, error) {
@@ -89,13 +95,21 @@ func buildSuccessfulQuery(email string, address string) ([]byte, error) {
 }
 
 func buildAdd() ([]byte, error) {
+  return _buildAdd(false, "")
+}
+
+func buildAddWithError(defaultValue string) ([]byte, error) {
+  return _buildAdd(true, defaultValue)
+}
+
+func _buildAdd(yesError bool, defaultValue string) ([]byte, error) {
   var add_data bytes.Buffer
     t, err := template.ParseFiles("templates/add.html")
     if err != nil {
       return nil, err
     }
 
-    err = t.Execute(&add_data, nil)
+    err = t.Execute(&add_data, AddData{yesError, defaultValue})
     if err != nil {
       return nil, err
     }
@@ -163,6 +177,24 @@ func AddHandler(w http.ResponseWriter, req *http.Request) {
   }
 
   w.Write(data)
+}
+
+func AddHandlerPost(w http.ResponseWriter, req *http.Request) {
+  email := req.FormValue("email")
+  fmt.Println("Got email " + email)
+  if !strings.Contains(email, "@") {
+    // It doesn't look like an email, so send them back
+    data, err := buildAddWithError(email)
+    if err != nil {
+      fmt.Println("Got error " + err.Error())
+      w.WriteHeader(500)
+      return
+    }
+    w.Write(data)
+    return
+  }
+
+  w.Write([]byte("yeah..."))
 }
 
 func DeleteHandler(w http.ResponseWriter, req *http.Request) {
