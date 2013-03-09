@@ -66,17 +66,26 @@ func buildNav(active string) ([]byte, error) {
 }
 
 func buildSuccessfulQuery(email string, address string) ([]byte, error) {
-    var buf bytes.Buffer
+    var query_content bytes.Buffer
     t, err := template.ParseFiles("templates/successful_query.html")
     if err != nil {
       return nil, err
     }
 
-    err = t.Execute(&buf, QueryData{email, address})
+    err = t.Execute(&query_content, QueryData{email, address})
     if err != nil {
       return nil, err
     }
-    return buf.Bytes(), nil
+    nav, err := buildNav("Query")
+    if err != nil {
+      return nil, err
+    }
+    data, err := buildBase(email + "|BtcReg", template.HTML(nav), template.HTML(query_content.Bytes()))
+    if err != nil {
+      return nil, err
+    }
+
+    return data, nil
 }
 
 func HomeHandler(w http.ResponseWriter, req *http.Request) {
@@ -88,21 +97,7 @@ func QueryHandler(w http.ResponseWriter, req *http.Request) {
     fmt.Println("Query handler called!")
     fmt.Println("Got email " + vars["email"])
 
-    nav, err := buildNav("Query")
-    if err != nil {
-      fmt.Println("Got error " + err.Error())
-      w.WriteHeader(500)
-      return
-    }
-    content, err := buildSuccessfulQuery("gerow.mike@gmail.com", "thisisatest")
-    if err != nil {
-      fmt.Println("Got error " + err.Error())
-      w.WriteHeader(500)
-      return
-    }
-    title := "query for gerow.mike@gmail.com"
-
-    data, err := buildBase(title, template.HTML(nav), template.HTML(content))
+    data, err := buildSuccessfulQuery("gerow.mike@gmail.com", "thisisatest")
     if err != nil {
       fmt.Println("Got error " + err.Error())
       w.WriteHeader(500)
