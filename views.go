@@ -88,6 +88,29 @@ func buildSuccessfulQuery(email string, address string) ([]byte, error) {
     return data, nil
 }
 
+func buildAdd() ([]byte, error) {
+  var add_data bytes.Buffer
+    t, err := template.ParseFiles("templates/add.html")
+    if err != nil {
+      return nil, err
+    }
+
+    err = t.Execute(&add_data, nil)
+    if err != nil {
+      return nil, err
+    }
+    nav, err := buildNav("Add")
+    if err != nil {
+      return nil, err
+    }
+    data, err := buildBase("Add|BtcReg", template.HTML(nav), template.HTML(add_data.Bytes()))
+    if err != nil {
+      return nil, err
+    }
+
+    return data, nil
+}
+
 func HomeHandler(w http.ResponseWriter, req *http.Request) {
     fmt.Println("Home handler called!")
 }
@@ -132,6 +155,14 @@ func DeleteAddressHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func AddHandler(w http.ResponseWriter, req *http.Request) {
+  data, err := buildAdd()
+  if err != nil {
+    fmt.Println("Got error " + err.Error())
+    w.WriteHeader(500)
+    return
+  }
+
+  w.Write(data)
 }
 
 func DeleteHandler(w http.ResponseWriter, req *http.Request) {
