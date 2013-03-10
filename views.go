@@ -32,6 +32,10 @@ type AddData struct {
     DefaultValue string
 }
 
+type AddSuccessData struct {
+    Email string
+}
+
 func buildBase(title string, nav template.HTML, content template.HTML) ([]byte, error) {
     var buf bytes.Buffer
     t, err := template.ParseFiles("templates/base.html")
@@ -125,6 +129,29 @@ func _buildAdd(yesError bool, defaultValue string) ([]byte, error) {
     return data, nil
 }
 
+func buildAddSuccess(email string) ([]byte, error) {
+  var addSuccessData bytes.Buffer
+  t, err := template.ParseFiles("templates/add_success.html")
+  if err != nil {
+    return nil, err
+  }
+
+  err = t.Execute(&addSuccessData, AddSuccessData{email})
+  if err != nil {
+    return nil, err
+  }
+  nav, err := buildNav("Add")
+  if err != nil {
+    return nil, err
+  }
+  data, err := buildBase("Add|BtcReg", template.HTML(nav), template.HTML(addSuccessData.Bytes()))
+  if err != nil {
+    return nil, err
+  }
+
+  return data, nil
+}
+
 func HomeHandler(w http.ResponseWriter, req *http.Request) {
     fmt.Println("Home handler called!")
 }
@@ -191,10 +218,15 @@ func AddHandlerPost(w http.ResponseWriter, req *http.Request) {
       return
     }
     w.Write(data)
-    return
+  } else {
+    data, err := buildAddSuccess(email)
+    if err != nil {
+      fmt.Println("Got error " + err.Error())
+      w.WriteHeader(500)
+      return
+    }
+    w.Write(data)
   }
-
-  w.Write([]byte("yeah..."))
 }
 
 func DeleteHandler(w http.ResponseWriter, req *http.Request) {

@@ -4,7 +4,7 @@
     <label class="control-label" for="email"><i class="icon-envelope"></i> Email</label>
     <div class="controls">
       <input type="text" id="email" name="email" {{if .Error}}value={{.DefaultValue}} {{else}}placeholder="test@example.com"{{end}}>
-      {{if .Error}}<span class="help-inline">Please correct the error</span>{{end}}</br>
+      {{if .Error}}<span class="help-inline">Invalid email address</span>{{end}}</br>
       <button type="submit" class="btn btn-primary">
         Submit
       </button>
