@@ -1,0 +1,18 @@
+<script>
+  function buttonHandler() {
+    hostAddress = top.location.host.toString();        
+    url = "http://" + hostAddress + "/q/" + document.getElementById("email").value
+    window.location.href = url
+  }
+</script>
+
+<h1>Query an email for its bitcoin address</h1>
+<div class="control-group">
+  <label class="control-label" for="email"><i class="icon-envelope"></i> Email</label>
+  <div class="controls">
+    <input type="text" id="email" name="email" placeholder="test@example.com"></br>
+    <button type="submit" class="btn btn-primary" onclick="buttonHandler()">
+      Submit
+    </button>
+  </div>
+</div>

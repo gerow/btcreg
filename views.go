@@ -152,8 +152,34 @@ func buildAddSuccess(email string) ([]byte, error) {
   return data, nil
 }
 
+func buildQueryForm() ([]byte, error) {
+  var queryFormData bytes.Buffer
+  t, err := template.ParseFiles("templates/query.html")
+  if err != nil {
+    return nil, err
+  }
+
+  err = t.Execute(&queryFormData, nil)
+  if err != nil {
+    return nil, err
+  }
+  nav, err := buildNav("Query")
+  if err != nil {
+    return nil, err
+  }
+  data, err := buildBase("Query|BtcReg", template.HTML(nav), template.HTML(queryFormData.Bytes()))
+  return data, nil
+}
+
 func HomeHandler(w http.ResponseWriter, req *http.Request) {
     fmt.Println("Home handler called!")
+    data, err := buildQueryForm()
+    if err != nil {
+      fmt.Println("Got error " + err.Error())
+      w.WriteHeader(500)
+      return
+    }
+    w.Write(data)
 }
 
 func QueryHandler(w http.ResponseWriter, req *http.Request) {
