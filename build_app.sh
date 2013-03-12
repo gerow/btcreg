@@ -1,6 +1,11 @@
 #!/bin/sh
 
+echo "downloading go dependencies..."
+go get
+echo "done"
+echo "creating application directory..."
 mkdir app
+echo "done"
 cd app
 echo "executing go build..."
 go build github.com/gerow/btcreg/btcreg
