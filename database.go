@@ -7,6 +7,7 @@ import (
 )
 
 var Database *sql.DB
+var DBVersion int = 1
 
 func LoadDatabase() {
   db, err := sql.Open("sqlite3", "./sqlite3.db")
