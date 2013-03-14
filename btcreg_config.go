@@ -6,8 +6,12 @@ type Config struct {
 }
 
 var Conf Config
+var confLoaded bool = false
 
 func LoadConfig() {
+  if confLoaded {
+    return
+  }
 }
 
 func (c Config) SqlDriver() string {

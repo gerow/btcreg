@@ -8,14 +8,12 @@ import(
 )
 
 type Migration struct {
-  Version int
   Up func(db *sql.DB) (success bool)
 }
 
-var migrations []Migration = []Migration{
+var migrations map[int] Migration = map[int] Migration{
   // First migration
-  Migration{
-    1,
+  1 : Migration{
     func(db *sql.DB) (success bool) {
       return true
     },
@@ -25,6 +23,10 @@ var migrations []Migration = []Migration{
 func CreateVersionTable(tx *sql.Tx) error {
   sql := "CREATE TABLE db_version (id INTEGER NOT NULL PRIMARY KEY, version INTEGER NOT NULL)"
   _, err := tx.Exec(sql)
+  if err != nil {
+    return err
+  }
+  _, err = tx.Exec("INSERT INTO db_version(id, version) values(0, 0)")
   if err != nil {
     return err
   }
@@ -39,9 +41,13 @@ func Version(tx *sql.Tx) (int, error) {
   hasTable := rows.Next()
   rows.Close()
   if !hasTable {
-    CreateVersionTable(tx)
+    return -1, nil
   }
-  return 1, nil
+  rows, err = tx.Query("SELECT version FROM db_version WHERE id=0")
+  rows.Next()
+  var version int
+  rows.Scan(&version)
+  return version, nil
 }
 
 func main() {
@@ -58,6 +64,11 @@ func main() {
     }
 
     version, err := Version(tx)
+    if version == -1 {
+      fmt.Println("db is uninitialized, creating version table")
+      CreateVersionTable(tx)
+      version, err = Version(tx)
+    }
     if err != nil {
       Rollback(tx)
       fmt.Println(err)
