@@ -3,17 +3,16 @@ package btcreg
 import (
     "database/sql"
     _ "github.com/mattn/go-sqlite3"
-   "fmt"
 )
 
 var Database *sql.DB
 var DBVersion int = 1
 
-func LoadDatabase() {
+func LoadDatabase() (error) {
   db, err := sql.Open("sqlite3", "./btcreg.sqlite3")
   if err != nil {
-    fmt.Println(err)
-    return
+    return err
   }
   Database = db
+  return nil
 }
