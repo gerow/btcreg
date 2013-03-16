@@ -13,7 +13,7 @@ echo "executing go build on application..."
 go build github.com/gerow/btcreg/btcreg
 echo "done"
 echo "executing go build on migration tool..."
-go build github.com/gerow/btcreg/migrate_db
+go build github.com/gerow/btcreg/migrate_db/migrate_db
 echo "done"
 echo "copying necessary files..."
 cp -r ../templates ../static .

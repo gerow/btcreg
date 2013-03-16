@@ -1,6 +1,7 @@
 package btcreg
 
 import (
+  "errors"
 )
 
 type Address struct {
@@ -18,8 +19,28 @@ type DeleteRequest struct {
   Email string
 }
 
-//func LoadAddressByEmail(email string) (Address, error) {
-//}
+func LoadAddressByEmail(email string) (Address, error) {
+  var a Address 
+
+
+  query := "SELECT address FROM addresses WHERE email=$1"
+  rows, err := Database.Query(query, email)
+  if err != nil {
+    return a, err
+  }
+  defer rows.Close()
+  var address string 
+  if rows.Next() {
+    rows.Scan(&address)
+  } else {
+    return a, errors.New("no such address")
+  }
+
+  a.Email = email
+  a.Address = address
+
+  return a, nil
+}
 
 //func LoadAddRequestByUUID(uuid string) (AddRequest, error) {
 //}
