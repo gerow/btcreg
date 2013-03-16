@@ -82,6 +82,11 @@ func Version(tx *sql.Tx) (int, error) {
 }
 
 func UpdateVersion(tx *sql.Tx, version int) (error) {
+  sql := "UPDATE db_version SET version=$1"
+  _, err := tx.Exec(sql, version)
+  if err != nil {
+    return err
+  }
   return nil
 }
 
