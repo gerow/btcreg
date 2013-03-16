@@ -8,13 +8,13 @@ import(
 )
 
 type Migration struct {
-  Up func(db *sql.Tx) (success bool)
+  Up func(db *sql.Tx) (error)
 }
 
 var migrations map[int] Migration = map[int] Migration{
   // First migration
   1 : Migration{
-    func(tx *sql.Tx) (success bool) {
+    func(tx *sql.Tx) (error) {
       sql := `CREATE TABLE addresses (
           id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
           email VARCHAR NOT NULL,
@@ -24,8 +24,7 @@ var migrations map[int] Migration = map[int] Migration{
       fmt.Println(sql)
       _, err := tx.Exec(sql)
       if err != nil {
-        fmt.Println(err)
-        return false
+        return err
       }
       sql = `CREATE TABLE add_requests (
           id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -35,8 +34,7 @@ var migrations map[int] Migration = map[int] Migration{
           );`
       _, err = tx.Exec(sql)
       if err != nil {
-        fmt.Println(err)
-        return false
+        return err
       }
       sql = `CREATE TABLE delete_requests (
           id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -46,10 +44,9 @@ var migrations map[int] Migration = map[int] Migration{
           );`
       _, err = tx.Exec(sql)
       if err != nil {
-        fmt.Println(err)
-        return false
+        return err 
       }
-      return true
+      return nil
     },
   },
 }
@@ -84,8 +81,8 @@ func Version(tx *sql.Tx) (int, error) {
   return version, nil
 }
 
-func UpdateVersion(tx *sql.Tx, version) (error) {
-  
+func UpdateVersion(tx *sql.Tx, version int) (error) {
+  return nil
 }
 
 func main() {
@@ -131,12 +128,14 @@ func main() {
     for version != btcreg.DBVersion {
       version += 1
       fmt.Printf("migrating to version %d\n", version)
-      if !migrations[version].Up(tx) {
+      err = migrations[version].Up(tx)
+      if err != nil {
+        fmt.Println(err)
         Rollback(tx)
         fmt.Println("failed to migrate database")
         return
       }
-      UpdateDBVersion(tx, version)
+      UpdateVersion(tx, version)
     }
     err = tx.Commit()
     if err != nil {
