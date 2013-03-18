@@ -1,0 +1,13 @@
+<h1>Delete your address</h1>
+<form method="post" action="/delete/">
+  <div class="control-group {{if .Error}}error{{end}}">
+    <label class="control-label" for="email"><i class="icon-envelope"></i> Email</label>
+    <div class="controls">
+      <input type="text" id="email" name="email" {{if .Error}}value={{.DefaultValue}} {{else}}placeholder="test@example.com"{{end}}>
+      {{if .Error}}<span class="help-inline">Invalid email address</span>{{end}}</br>
+      <button type="submit" class="btn btn-primary">
+        Submit
+      </button>
+    </div>
+  </div>
+</form>

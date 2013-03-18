@@ -32,7 +32,16 @@ type AddData struct {
     DefaultValue string
 }
 
+type Delete struct {
+    Error bool
+    DefaultValue string
+}
+
 type AddSuccessData struct {
+    Email string
+}
+
+type DeleteSuccessData struct {
     Email string
 }
 
@@ -152,6 +161,61 @@ func buildAddSuccess(email string) ([]byte, error) {
   return data, nil
 }
 
+func buildDelete() ([]byte, error) {
+  return _buildDelete(false, "")
+}
+
+func buildDeleteWithError(defaultValue string) ([]byte, error) {
+  return _buildDelete(true, defaultValue)
+}
+
+func _buildDelete(yesError bool, defaultValue string) ([]byte, error) {
+  var delete_data bytes.Buffer
+    t, err := template.ParseFiles("templates/delete.html")
+    if err != nil {
+      return nil, err
+    }
+
+    err = t.Execute(&delete_data, AddData{yesError, defaultValue})
+    if err != nil {
+      return nil, err
+    }
+    nav, err := buildNav("Delete")
+    if err != nil {
+      return nil, err
+    }
+    data, err := buildBase("Delete|BtcReg", template.HTML(nav), template.HTML(delete_data.Bytes()))
+    if err != nil {
+      return nil, err
+    }
+
+    return data, nil
+}
+
+func buildDeleteSuccess(email string) ([]byte, error) {
+  var deleteSuccessData bytes.Buffer
+  t, err := template.ParseFiles("templates/delete_success.html")
+  if err != nil {
+    return nil, err
+  }
+
+  err = t.Execute(&deleteSuccessData , DeleteSuccessData{email})
+  if err != nil {
+    return nil, err
+  }
+  nav, err := buildNav("Delete")
+  if err != nil {
+    return nil, err
+  }
+  data, err := buildBase("Delete|BtcReg", template.HTML(nav), template.HTML(deleteSuccessData.Bytes()))
+  if err != nil {
+    return nil, err
+  }
+
+  return data, nil
+}
+
+
 func buildQueryForm() ([]byte, error) {
   var queryFormData bytes.Buffer
   t, err := template.ParseFiles("templates/query.html")
@@ -215,12 +279,6 @@ func NewAddressHandler(w http.ResponseWriter, req *http.Request) {
     fmt.Println("Got uuid " + vars["uuid"])
 }
 
-func DeleteAddressHandler(w http.ResponseWriter, req *http.Request) {
-    vars := mux.Vars(req)
-    fmt.Println("Delete address handler called!")
-    fmt.Println("Got uuid " + vars["uuid"])
-}
-
 func AddHandler(w http.ResponseWriter, req *http.Request) {
   data, err := buildAdd()
   if err != nil {
@@ -255,7 +313,41 @@ func AddHandlerPost(w http.ResponseWriter, req *http.Request) {
   }
 }
 
+func DeleteAddressHandler(w http.ResponseWriter, req *http.Request) {
+}
+
 func DeleteHandler(w http.ResponseWriter, req *http.Request) {
+  data, err := buildDelete()
+  if err != nil {
+    fmt.Println("Got error " + err.Error())
+    w.WriteHeader(500)
+    return
+  }
+
+  w.Write(data)
+}
+
+func DeleteHandlerPost(w http.ResponseWriter, req *http.Request) {
+  email := req.FormValue("email")
+  fmt.Println("Got email " + email)
+  if !strings.Contains(email, "@") {
+    // It doesn't look like an email, so send them back
+    data, err := buildDeleteWithError(email)
+    if err != nil {
+      fmt.Println("Got error " + err.Error())
+      w.WriteHeader(500)
+      return
+    }
+    w.Write(data)
+  } else {
+    data, err := buildDeleteSuccess(email)
+    if err != nil {
+      fmt.Println("Got error " + err.Error())
+      w.WriteHeader(500)
+      return
+    }
+    w.Write(data)
+  }
 }
 
 func AboutHandler(w http.ResponseWriter, req *http.Request) {

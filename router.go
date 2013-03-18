@@ -19,6 +19,7 @@ func RunRouter() {
     r.HandleFunc("/add/", AddHandler).Methods("GET")
     r.HandleFunc("/add/", AddHandlerPost).Methods("POST")
     r.HandleFunc("/delete/", DeleteHandler).Methods("GET")
+    r.HandleFunc("/delete/", DeleteHandlerPost).Methods("POST")
     r.HandleFunc("/about/", AboutHandler).Methods("GET")
     http.ListenAndServe(":8080", r)
 }

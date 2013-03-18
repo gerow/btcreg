@@ -42,6 +42,15 @@ func LoadAddressByEmail(email string) (Address, error) {
   return a, nil
 }
 
+func InsertAddress(address Address) (error) {
+  command := "INSERT INTO addresses (email, address) VALUES ($1, $2)"
+  _, err := Database.Exec(command, address.Email, address.Address)
+  if err != nil {
+    return err
+  }
+  return nil
+}
+
 //func LoadAddRequestByUUID(uuid string) (AddRequest, error) {
 //}
 
