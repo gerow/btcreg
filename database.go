@@ -5,6 +5,7 @@ import (
 )
 
 var MongoSession *mgo.Session
+var DB *mgo.Database
 
 func LoadDatabase() (error) {
 	s, err := mgo.Dial("localhost")
@@ -12,6 +13,7 @@ func LoadDatabase() (error) {
 		return err
 	}
 	MongoSession = s
+	DB = MongoSession.DB("test")
 	err = ensureIndices()
 	if err != nil {
 		return err
@@ -27,6 +29,6 @@ func ensureIndices() (error) {
 		Background: true,
 		Sparse: true,
 	}
-	err := MongoSession.DB("test").C("addresses").EnsureIndex(addressIndex)
+	err := DB.C("addresses").EnsureIndex(addressIndex)
 	return err
 }
