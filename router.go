@@ -3,6 +3,7 @@ package btcreg
 import (
     "net/http"
     "github.com/gorilla/mux"
+    "fmt"
 )
 
 func RunRouter() {
@@ -21,5 +22,8 @@ func RunRouter() {
     r.HandleFunc("/delete/", DeleteHandler).Methods("GET")
     r.HandleFunc("/delete/", DeleteHandlerPost).Methods("POST")
     r.HandleFunc("/about/", AboutHandler).Methods("GET")
+
+    fmt.Println("router initialized")
+    fmt.Println("listening on port 8080...")
     http.ListenAndServe(":8080", r)
 }
