@@ -22,7 +22,6 @@ type DeleteRequest struct {
 func LoadAddressByEmail(email string) (Address, error) {
   var a Address 
 
-
   query := "SELECT address FROM addresses WHERE email=$1"
   rows, err := Database.Query(query, email)
   if err != nil {
