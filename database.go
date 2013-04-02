@@ -1,18 +1,16 @@
 package btcreg
 
 import (
-    "database/sql"
-    _ "github.com/mattn/go-sqlite3"
+  "labix.org/v2/mgo"
 )
 
-var Database *sql.DB
-var DBVersion int = 1
+var MongoSession *mgo.Session
 
 func LoadDatabase() (error) {
-  db, err := sql.Open("sqlite3", "./btcreg.sqlite3")
-  if err != nil {
-    return err
-  }
-  Database = db
-  return nil
+	s, err := mgo.Dial("localhost")
+	if err != nil {
+		return err
+	}
+	MongoSession = s
+	return nil
 }

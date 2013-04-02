@@ -10,10 +10,10 @@ func Main() {
     fmt.Println(err)
     return
   }
-  a := Address{ "test@example.com", "something bitcoiny" }
-  err = InsertAddress(a)
-  if err != nil {
-    fmt.Println(err)
-  }
+  //a := Address{ "test@example.com", "something bitcoiny" }
+  //err = InsertAddress(a)
+  //if err != nil {
+  //  fmt.Println(err)
+  //}
   RunRouter()
 }
