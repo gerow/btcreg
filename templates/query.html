@@ -1,9 +1,9 @@
 <script>
-  function buttonHandler() {
-    hostAddress = top.location.host.toString();        
-    url = "http://" + hostAddress + "/q/" + document.getElementById("email").value
-    window.location.href = url
-  }
+function buttonHandler() {
+  hostAddress = top.location.host.toString();        
+  url = "http://" + hostAddress + "/q/" + document.getElementById("email").value
+  window.location.href = url
+}
 </script>
 
 <h1>Query an email for its bitcoin address</h1>
@@ -16,3 +16,10 @@
     </button>
   </div>
 </div>
+<script>
+$("#email").keyup(function(event){
+  if(event.keyCode == 13){
+    buttonHandler()
+  }
+})
+</script>
