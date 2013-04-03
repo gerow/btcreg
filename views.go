@@ -27,6 +27,10 @@ type QueryData struct {
     Address string
 }
 
+type FailedQueryData struct {
+    Email string
+}
+
 type AddData struct {
     Error bool
     DefaultValue string
@@ -92,6 +96,29 @@ func buildSuccessfulQuery(email string, address string) ([]byte, error) {
     }
 
     err = t.Execute(&query_content, QueryData{email, address})
+    if err != nil {
+      return nil, err
+    }
+    nav, err := buildNav("Query")
+    if err != nil {
+      return nil, err
+    }
+    data, err := buildBase(email + "|BtcReg", template.HTML(nav), template.HTML(query_content.Bytes()))
+    if err != nil {
+      return nil, err
+    }
+
+    return data, nil
+}
+
+func buildFailedQuery(email string) ([]byte, error) {
+    var query_content bytes.Buffer
+    t, err := template.ParseFiles("templates/failed_query.html")
+    if err != nil {
+      return nil, err
+    }
+
+    err = t.Execute(&query_content, FailedQueryData{email})
     if err != nil {
       return nil, err
     }
@@ -251,7 +278,21 @@ func QueryHandler(w http.ResponseWriter, req *http.Request) {
     fmt.Println("Query handler called!")
     fmt.Println("Got email " + vars["email"])
 
-    data, err := buildSuccessfulQuery("gerow.mike@gmail.com", "thisisatest")
+    addr, err := LoadAddressByEmail(vars["email"])
+    if err != nil {
+      fmt.Println("failed to find address")
+      data, err := buildFailedQuery(vars["email"])
+      if err != nil {
+        fmt.Println("got error " + err.Error())
+        w.WriteHeader(500)
+        return
+      }
+      w.WriteHeader(404)
+      w.Write(data)
+      return
+    }
+
+    data, err := buildSuccessfulQuery(addr.Email, addr.Address)
     if err != nil {
       fmt.Println("Got error " + err.Error())
       w.WriteHeader(500)
